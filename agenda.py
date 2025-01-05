@@ -9,7 +9,27 @@ from utils import *
 def main(page: ft.Page):
     page.title = "Home"
     page.theme_mode = ft.ThemeMode.DARK
-    page.bgcolor = ft.colors.BLACK      
+
+    # Inicializando o logo
+    logo = ft.Image(
+        src='assets/logo (2).png',  # Logo inicial
+        scale=ft.transform.Scale(1.5)
+    )
+
+    def toggle_theme(e):
+            page.theme_mode = (
+                ft.ThemeMode.LIGHT if page.theme_mode == ft.ThemeMode.DARK else ft.ThemeMode.DARK
+            )
+             # Alterna o logo com base no tema
+            if page.theme_mode == ft.ThemeMode.DARK:
+                logo.src = 'assets/logo (2).png'
+            else:
+                logo.src = 'assets/logo.jpg'
+                 
+            
+            page.update()
+        
+    
 
     # Criação do banco de dados
     create_db()
@@ -20,12 +40,9 @@ def main(page: ft.Page):
         read_only=True,  # Impede edição direta
         width=305,
         height=50,
-        filled=True,
-        border_color="transparent",
-        bgcolor="white",
         text_size=15,
     )
-
+    
     
 
     # Função para buscar horários ocupados para uma data específica
@@ -145,43 +162,78 @@ def main(page: ft.Page):
             ft.dropdown.Option(horario) for horario in gerar_horarios()
         ],
     )
+   
 
     def route_change(e):
+       
+        style = ft.ButtonStyle(
+            color={ft.MaterialState.HOVERED: ft.colors.AMBER},
+            shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=10),
+            },
+            padding={ft.MaterialState.DEFAULT:ft.padding.all(40)},
+        
+            
+        )
         page.views.clear()
         page.views.append(
             ft.View(
                 "/",
+                
                 [
-                    ft.AppBar(title=ft.Text("Home"), bgcolor=ft.colors.SURFACE_VARIANT),
+                    ft.AppBar(title=ft.Text("Home"), bgcolor=ft.colors.SURFACE_VARIANT,
+                              actions=[
+                              
+                              ft.IconButton(
+                                  icon=ft.icons.BRIGHTNESS_6,
+                                  on_click=toggle_theme,
+                                  tooltip='Alternar tema'
+                              )
+                ],
+                              ),
+                    ft.Divider(color='transparent',height=30),
                     ft.Row(
                         controls=[
                             ft.Container(
                                 width=200,
                                 height=200,
                                 padding=5,  # Espaçamento interno ao redor do logo
+                                content=logo,
                                 border=ft.border.all(2, ft.colors.AMBER),  # Borda dourada
-                                border_radius=ft.border_radius.all(10),  # Bordas arredondadas
-                                                content=ft.Image(src='assets/logo.jpg'),
+                                border_radius=ft.border_radius.all(100),  # Bordas arredondadas
+                                
                             ),
                             
                             ft.Container(
                                 width=400,
-                                height=200,
-                                border_radius=ft.border_radius.all(10),
-                                border=ft.border.all(2, ft.colors.AMBER),
+                                height=250,
+                                border_radius=ft.border_radius.all(60),
+                                # border=ft.border.all(2, ft.colors.AMBER),
                                 padding=20,
                                 content=ft.Text('✨ "Bem-vinda ao nosso Studio! Aqui, cada detalhe é pensado para realçar sua beleza e oferecer uma experiência única. Agende seu momento de cuidado e fique ainda mais deslumbrante!" 💖',
-                                                size=18,
+                                                size=20,
                                                 text_align="justify", 
                                                 max_lines=6, 
                                                 )
                             )
                         ],alignment=ft.MainAxisAlignment.SPACE_EVENLY
                     ),
+                    ft.Container(
+                        height=80
+                            ),
+                        
                     ft.Row(
                         controls=[
-                                ft.ElevatedButton("Agendar", on_click=lambda _: page.go("/agendar")),
-                                ft.ElevatedButton("Consultar Agendamentos", on_click=lambda _: page.go("/consulta")),
+                                ft.ElevatedButton( 
+                                                  on_click=lambda _: page.go("/agendar"),
+                                                  icon=ft.icons.ADD,
+                                                  text='AGENDAR',
+                                                  icon_color="white",  # Cor do ícone
+                                                  style=style
+                                                  
+                                                  ),
+                                ft.ElevatedButton("CONSULTAR", on_click=lambda _: page.go("/consulta"),
+                                                  style=style,
+                                                  icon=ft.icons.SEARCH),
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_EVENLY
                     ),
@@ -189,7 +241,7 @@ def main(page: ft.Page):
                 ],
             )
         )
-    
+        
         if page.route == "/agendar":
             # Definir os campos de entrada dentro da rota
             nome_input = ft.TextField(label="Nome", hint_text="Digite seu nome",capitalization=ft.TextCapitalization.WORDS,autofocus=True)
@@ -276,6 +328,10 @@ def main(page: ft.Page):
             )
 
         if page.route == "/consulta":
+            buscar_nomes = ft.TextField(
+                    icon=ft.icons.SEARCH,
+                    hint_text='Buscar por nome'
+                )
             def handle_delete(id_agendamento):
                 confirm_dialog = ft.AlertDialog(
                     title=ft.Text("Confirmar Exclusão"),
@@ -337,13 +393,7 @@ def main(page: ft.Page):
                 ]
             page.update()
 
-            def buscar_agendamentos():
-                conn = sqlite3.connect("agendamentos.db")
-                cursor = conn.cursor()
-                cursor.execute("SELECT id, nome, sobrenome, telefone, servico, data_agendamento, horario FROM agendamentos")
-                resultados = cursor.fetchall()
-                conn.close()
-                return resultados
+           
 
             # Buscar os agendamentos
             agendamentos = buscar_agendamentos()
@@ -392,6 +442,11 @@ def main(page: ft.Page):
                     "/consulta",
                     [
                         ft.AppBar(title=ft.Text("Consultar Agendamentos"), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.Row(
+                            controls=[
+                                buscar_nomes
+                            ],alignment=ft.MainAxisAlignment.CENTER
+                        ),
                         ft.Row(
                             controls=[
                                 ft.Text("Agendamentos Realizados", size=25, weight="bold"),

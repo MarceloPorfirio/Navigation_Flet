@@ -330,7 +330,8 @@ def main(page: ft.Page):
         if page.route == "/consulta":
             buscar_nomes = ft.TextField(
                     icon=ft.icons.SEARCH,
-                    hint_text='Buscar por nome'
+                    hint_text='Buscar por nome',
+                    on_change=lambda e: atualizar_tabela(e.control.value)
                 )
             def handle_delete(id_agendamento):
                 confirm_dialog = ft.AlertDialog(
@@ -366,37 +367,36 @@ def main(page: ft.Page):
                     e.control.update()
                 
 
-            def atualizar_tabela():
-                # Buscar os agendamentos atualizados
-                agendamentos = buscar_agendamentos()
-                
-                
+            def atualizar_tabela(nome_busca=""):
+                # Buscar os agendamentos atualizados (ou filtrados pelo nome)
+                agendamentos = buscar_agendamentos_nome(nome_busca)
+
                 # Atualizar a tabela com os novos dados
                 tabela_agendamentos.rows = [
                     ft.DataRow(
                         cells=[
-                            ft.DataCell(ft.Text(agendamento[1])),
-                            ft.DataCell(ft.Text(agendamento[2])),
-                            ft.DataCell(ft.Text(agendamento[3])),
-                            ft.DataCell(ft.Text(agendamento[4])),
-                            ft.DataCell(ft.Text(agendamento[5])),
-                            ft.DataCell(ft.Text(agendamento[6])),
+                            ft.DataCell(ft.Text(agendamento[1])),  # Nome
+                            ft.DataCell(ft.Text(agendamento[2])),  # Sobrenome
+                            ft.DataCell(ft.Text(agendamento[3])),  # Telefone
+                            ft.DataCell(ft.Text(agendamento[4])),  # Serviço
+                            ft.DataCell(ft.Text(agendamento[5])),  # Data
+                            ft.DataCell(ft.Text(agendamento[6])),  # Horário
                             ft.DataCell(ft.IconButton(
                                 icon=ft.icons.DELETE,
                                 icon_color='red',
                                 on_click=lambda e, a=agendamento[0]: handle_delete(a)
                             )),
                         ],
-                        
                     )
                     for agendamento in agendamentos
                 ]
-            page.update()
+                page.update()
 
-           
+
+            
 
             # Buscar os agendamentos
-            agendamentos = buscar_agendamentos()
+            agendamentos = buscar_agendamentos_nome("")  # Inicializa com todos os agendamentos
             
             tabela_agendamentos = ft.DataTable(
                 columns=[

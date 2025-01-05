@@ -41,3 +41,12 @@ def buscar_agendamentos():
     agendamentos = cursor.fetchall()
     conn.close()
     return agendamentos
+
+# Função para buscar agendamentos pelo nome
+def buscar_agendamentos_nome(nome):
+    conn = sqlite3.connect("agendamentos.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM agendamentos WHERE nome LIKE ?", ('%' + nome + '%',))
+    agendamentos = cursor.fetchall()
+    conn.close()
+    return agendamentos

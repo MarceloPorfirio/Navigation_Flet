@@ -62,4 +62,4 @@ def atualizar_tabela_por_data(data_selecionada):
         """, (data_selecionada,))
     agendamentos = cursor.fetchall()
     conn.close()
-    return agendamentos
+   

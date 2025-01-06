@@ -357,12 +357,17 @@ def main(page: ft.Page):
                 icon=ft.icons.CALENDAR_MONTH,
                 on_click=lambda _: datepicker_consulta.pick_date()
             )
-
+             # Atualiza o campo de texto e filtra a tabela ao selecionar a data
+            def atualizar_data_selecionada(e):
+                if e.control.value:
+                    buscar_data.value = e.control.value.strftime('%d/%m/%Y')
+                    atualizar_tabela_por_data(buscar_data.value)
+                    page.update()
 
             datepicker_consulta = ft.DatePicker(
             first_date=datetime.datetime(year=2018, month=10, day=1),
             last_date=datetime.datetime(year=2040, month=10, day=1),
-            # on_change=atualizar_data_selecionada
+            on_change=atualizar_data_selecionada
             )
             page.overlay.append(datepicker_consulta)
 
@@ -400,7 +405,41 @@ def main(page: ft.Page):
             def toogle_selected(e):
                     e.control.selected = not e.control.selected
                     e.control.update()
-                
+
+            def atualizar_tabela_por_data(data_selecionada):
+                # Consulta os registros no banco de dados para a data selecionada
+                conn = sqlite3.connect("agendamentos.db")
+                cursor = conn.cursor()
+                cursor.execute("""
+                        SELECT id, nome, sobrenome, telefone, servico, data_agendamento, horario 
+                        FROM agendamentos 
+                        WHERE data_agendamento = ?
+                    """, (data_selecionada,))
+                agendamentos = cursor.fetchall()
+                conn.close()
+                # Atualiza a tabela diretamente
+                tabela_agendamentos.rows = [
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(ft.Text(agendamento[1])),  # Nome
+                            ft.DataCell(ft.Text(agendamento[2])),  # Sobrenome
+                            ft.DataCell(ft.Text(agendamento[3])),  # Telefone
+                            ft.DataCell(ft.Text(agendamento[4])),  # Serviço
+                            ft.DataCell(ft.Text(agendamento[5])),  # Data
+                            ft.DataCell(ft.Text(agendamento[6])),  # Horário
+                            ft.DataCell(
+                                ft.IconButton(
+                                    icon=ft.icons.DELETE,
+                                    icon_color='red',
+                                    on_click=lambda e, id_agendamento=agendamento[0]: handle_delete(id_agendamento)
+                                )
+                            ),
+                        ],
+                    )
+                    for agendamento in agendamentos
+                ]
+                page.update()
+ 
 
             def atualizar_tabela(nome_busca=""):
                 # Buscar os agendamentos atualizados (ou filtrados pelo nome)
@@ -426,9 +465,6 @@ def main(page: ft.Page):
                     for agendamento in agendamentos
                 ]
                 page.update()
-
-
-            
 
             # Buscar os agendamentos
             agendamentos = buscar_agendamentos_nome("")  # Inicializa com todos os agendamentos

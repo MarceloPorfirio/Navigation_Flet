@@ -261,7 +261,16 @@ def main(page: ft.Page):
                 ft.View(
                     "/store",
                     [
-                        ft.AppBar(title=ft.Text("Agendar Horário"), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.AppBar(title=ft.Text("Agendar Horário"),
+                                   bgcolor=ft.colors.SURFACE_VARIANT,
+                                   actions=[
+                                    ft.IconButton(
+                                        icon=ft.icons.BRIGHTNESS_6,
+                                        on_click=toggle_theme,
+                                        tooltip='Alternar tema'
+                              )
+                                ]
+                                   ),
                         ft.Container(
                             content=ft.Column(
                                 [
@@ -333,6 +342,32 @@ def main(page: ft.Page):
                     hint_text='Buscar por nome',
                     on_change=lambda e: atualizar_tabela(e.control.value)
                 )
+            
+            # Campo de busca por data
+            buscar_data = ft.TextField(
+                value="Selecionar Data",
+                read_only=True,
+                width=305,
+                height=50,
+                text_size=15,
+            )
+
+             # Botão para abrir o DatePicker
+            selecionar_data_button = ft.IconButton(
+                icon=ft.icons.CALENDAR_MONTH,
+                on_click=lambda _: datepicker_consulta.pick_date()
+            )
+
+
+            datepicker_consulta = ft.DatePicker(
+            first_date=datetime.datetime(year=2018, month=10, day=1),
+            last_date=datetime.datetime(year=2040, month=10, day=1),
+            # on_change=atualizar_data_selecionada
+            )
+            page.overlay.append(datepicker_consulta)
+
+
+
             def handle_delete(id_agendamento):
                 confirm_dialog = ft.AlertDialog(
                     title=ft.Text("Confirmar Exclusão"),
@@ -441,12 +476,25 @@ def main(page: ft.Page):
                 ft.View(
                     "/consulta",
                     [
-                        ft.AppBar(title=ft.Text("Consultar Agendamentos"), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.AppBar(title=ft.Text("Consultar Agendamentos"),
+                                bgcolor=ft.colors.SURFACE_VARIANT,
+                                actions=[
+                                    ft.IconButton(
+                                        icon=ft.icons.BRIGHTNESS_6,
+                                        on_click=toggle_theme,
+                                        tooltip='Alternar tema'
+                              )
+                                ]
+                                ),
+                        ft.Divider(color='transparent'),
                         ft.Row(
                             controls=[
-                                buscar_nomes
+                                buscar_nomes,
+                                selecionar_data_button,
+                                buscar_data
                             ],alignment=ft.MainAxisAlignment.CENTER
                         ),
+                        ft.Divider(color='transparent'),
                         ft.Row(
                             controls=[
                                 ft.Text("Agendamentos Realizados", size=25, weight="bold"),

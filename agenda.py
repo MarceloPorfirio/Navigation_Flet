@@ -171,8 +171,6 @@ def main(page: ft.Page):
             shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=10),
             },
             padding={ft.MaterialState.DEFAULT:ft.padding.all(40)},
-        
-            
         )
         page.views.clear()
         page.views.append(

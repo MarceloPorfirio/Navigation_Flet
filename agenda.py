@@ -312,7 +312,7 @@ def main(page: ft.Page):
                                     ft.Divider(color='transparent'),
                                     ft.Row(
                                         controls=[
-                                        ft.ElevatedButton("Agendar",width=200, on_click=lambda e: show_dialog(
+                                        ft.ElevatedButton("AGENDAR",width=200,style=style,icon=ft.icons.CHECK,on_click=lambda e: show_dialog(
                                         e, 
                                         nome_input, 
                                         sobrenome_input, 

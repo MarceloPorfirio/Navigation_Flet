@@ -135,15 +135,25 @@ class TodoApp(ft.Column):
             self.new_task.focus()
             self.update()
             self.update_dashboard()
+            recent_activities.append(f"Nova tarefa: {task.task_name}")
+            if len(recent_activities) > 3:
+                recent_activities.pop(0)
 
     def task_status_change(self, task):
         self.update()
         self.update_dashboard()
+        status = "concluída" if task.completed else "reaberta"
+        recent_activities.append(f"Tarefa '{task.task_name}' {status}")
+        if len(recent_activities) > 3:
+            recent_activities.pop(0)
 
     def task_delete(self, task):
         self.tasks.controls.remove(task)
         self.update()
         self.update_dashboard()
+        recent_activities.append(f"Tarefa removida: {task.task_name}")
+        if len(recent_activities) > 3:
+            recent_activities.pop(0)
 
     def tabs_changed(self, e):
         self.update()
@@ -184,6 +194,8 @@ def main(page: ft.Page):
     productivity = 0
     recent_activities = []
 
+    # Substitua esta parte do código (função update_dashboard_stats):
+
     def update_dashboard_stats():
         nonlocal total_tasks, completed_tasks, pending_tasks, productivity
         total_tasks = len(todo_app.tasks.controls)
@@ -197,16 +209,20 @@ def main(page: ft.Page):
         dashboard_pending.value = str(pending_tasks)
         dashboard_productivity.value = f"{productivity:.0f}%"
         
-        # Atualiza o gráfico
-        line_chart.data[0].data_points = [
-            ft.LineChartDataPoint(i, (i+3)*2) for i in range(1, 6)
-        ]
+        # Atualiza a barra de produtividade (AGORA CORRETAMENTE)
+        productivity_bar.content.width = f"{productivity}%"
+        productivity_bar.content.bgcolor = (
+            ft.colors.GREEN if productivity >= 70 
+            else ft.colors.YELLOW if productivity >= 40 
+            else ft.colors.RED
+        )
         
         # Atualiza atividades recentes
-        if len(recent_activities) > 3:
-            recent_activities.pop(0)
         activities_list.controls = [
-            ft.ListTile(title=ft.Text(activity)) for activity in recent_activities
+            ft.ListTile(
+                title=ft.Text(activity),
+                leading=ft.Icon(ft.icons.HISTORY)
+            ) for activity in recent_activities
         ]
         
         dashboard.update()
@@ -375,27 +391,40 @@ def main(page: ft.Page):
         content=todo_app
     )
 
-    # Componentes do Dashboard
+    # Componentes do Dashboard (versão simplificada)
     dashboard_total = ft.Text("0", size=32, weight="bold")
     dashboard_completed = ft.Text("0", size=32, weight="bold")
     dashboard_pending = ft.Text("0", size=32, weight="bold")
-    dashboard_productivity = ft.Text("0%", size=20)
+    dashboard_productivity = ft.Text("0%", size=16, color=ft.colors.WHITE)
     
-    line_chart = ft.LineChart(
-        data_series=[
-            ft.LineChartData(
-                data_points=[ft.LineChartDataPoint(i, (i+3)*2) for i in range(1, 6)],
-                stroke_width=3,
-                color=ft.colors.BLUE
-            )
-        ],
-        left_axis=ft.ChartAxis(labels_size=40),
-        bottom_axis=ft.ChartAxis(labels_size=40),
+    productivity_bar = ft.Container(
         width=350,
-        height=200
+        height=50,
+        bgcolor=ft.colors.GREY_300,
+        border_radius=25,
+        padding=5,
+        content=ft.Stack(
+            controls=[
+                ft.Container(
+                    width="100%",
+                    height=40,
+                    bgcolor=ft.colors.GREY_200,
+                    border_radius=20
+                ),
+                ft.Container(
+                    width="0%",  # Começa em 0% e será atualizado
+                    height=40,
+                    bgcolor=ft.colors.BLUE,
+                    border_radius=20,
+                    alignment=ft.alignment.center,
+                    content=dashboard_productivity,
+                    animate=ft.animation.Animation(300, "bounceOut")
+                )
+            ]
+        )
     )
     
-    activities_list = ft.ListView(height=150)
+    activities_list = ft.ListView(expand=True, spacing=10)
     
     dashboard = ft.Column(
         controls=[
@@ -407,6 +436,7 @@ def main(page: ft.Page):
                 [ft.Text(value="Dashboard", style=ft.TextThemeStyle.HEADLINE_MEDIUM)],
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
+            ft.Divider(height=20),
             ft.Row(
                 controls=[
                     ft.Container(
@@ -458,32 +488,14 @@ def main(page: ft.Page):
                 alignment=ft.MainAxisAlignment.SPACE_EVENLY
             ),
             ft.Divider(height=20),
-            ft.Text("Produtividade:", size=16),
-            ft.Container(
-                width=350,
-                height=50,
-                bgcolor=ft.colors.BLUE_50,
-                border_radius=25,
-                padding=5,
-                content=ft.Row(
-                    controls=[
-                        ft.Container(
-                            width=f"{productivity}%",
-                            height=40,
-                            bgcolor=ft.colors.BLUE,
-                            border_radius=20,
-                            alignment=ft.alignment.center,
-                            content=dashboard_productivity
-                        )
-                    ]
-                )
-            ),
+            ft.Text("Produtividade:", size=16, weight="bold"),
+            productivity_bar,
             ft.Divider(height=20),
-            line_chart,
-            ft.Divider(height=20),
-            ft.Text("Atividades Recentes", size=18, weight="bold"),
+            ft.Text("Atividades Recentes:", size=16, weight="bold"),
             activities_list
-        ]
+        ],
+        scroll=ft.ScrollMode.AUTO,
+        expand=True
     )
     
     dashboard_container = ft.Container(

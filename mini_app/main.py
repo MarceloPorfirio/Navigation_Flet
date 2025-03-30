@@ -28,13 +28,19 @@ def main(page: ft.Page):
     # Controle principal
     current_view = ft.Ref[ft.Container]()
 
+    def create_icon_button(icon, view_name):
+        return ft.IconButton(
+            icon=icon,
+            on_click=lambda e: change_view(view_name),
+            icon_color="blue",  # Cor única para todos
+        )
+    
     def change_view(view_name):
         views = {
             "home": home_view,
             "edit": edit_view,
             "notes": notes_view,
             "todo": todo_view,
-            # "dashboard": dashboard_view,
             "settings": settings_view,
             "support": support_view
         }
@@ -50,32 +56,32 @@ def main(page: ft.Page):
         height=550,
         bgcolor="white",
         border_radius=16,
-        shadow=ft.BoxShadow(blur_radius=10, color=ft.colors.with_opacity(0.2, 'black'))
+        shadow=ft.BoxShadow(blur_radius=10, color='black')
     )
 
     # Barra inferior (idêntica ao original)
     page.bottom_appbar = ft.BottomAppBar(
-        bgcolor="#f6f6f6ff",
+        bgcolor="#f6f6f6",
         shape=ft.NotchShape.CIRCULAR,
         content=ft.Row(
             controls=[
-                ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e: change_view("edit")),
-                ft.IconButton(icon=ft.icons.SETTINGS, on_click=lambda e: change_view("settings")),
+                create_icon_button(ft.icons.EDIT, "edit"),
+                create_icon_button(ft.icons.SETTINGS, "settings"),
                 ft.Container(expand=True),
-                ft.IconButton(icon=ft.icons.NOTE_ADD, on_click=lambda e: change_view("notes")),
-                ft.IconButton(icon=ft.icons.CHECKLIST, on_click=lambda e: change_view("todo")),
-                ft.IconButton(icon=ft.icons.HELP, on_click=lambda e: change_view("support")),
+                create_icon_button(ft.icons.NOTE_ADD, "notes"),
+                create_icon_button(ft.icons.CHECKLIST, "todo"),
+                create_icon_button(ft.icons.HELP, "support"),
             ]
         )
     )
 
-    # Botão flutuante (idêntico ao original)
+       # Botão flutuante centralizado
     page.floating_action_button = ft.FloatingActionButton(
         icon=ft.icons.HOME,
         on_click=lambda e: change_view("home"),
         bgcolor='blue'
     )
+    page.floating_action_button_location = ft.FloatingActionButtonLocation.CENTER_DOCKED
 
     page.add(current_view.current)
-
 ft.app(target=main)

@@ -1,7 +1,7 @@
 import flet as ft
 from datetime import datetime
 
-def view(navigate_to):
+def view(page: ft.Page):  # Recebemos a página como parâmetro
     # Campo de feedback
     feedback_text = ft.TextField(
         multiline=True,
@@ -30,6 +30,50 @@ def view(navigate_to):
     
     for i, star in enumerate(stars):
         star.on_click = lambda e, idx=i: rate_app(e, idx)
+
+    # Diálogo de confirmação
+    confirm_dialog = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("Obrigado!"),
+        content=ft.Text("Seu feedback foi enviado com sucesso."),
+        actions=[
+            ft.TextButton("OK", on_click=lambda e: close_dialog(e)),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    def open_dialog(e):
+        # Verifica se há texto no feedback antes de enviar
+        if not feedback_text.value:
+            feedback_text.error_text = "Por favor, digite seu feedback"
+            feedback_text.update()
+            return
+        
+        # Aqui você pode adicionar a lógica para enviar o feedback
+        print(f"Feedback enviado: {feedback_text.value}")
+        print(f"Avaliação: {rating.value}")
+        
+        # Limpa os campos após o envio
+        feedback_text.value = ""
+        feedback_text.error_text = None
+        feedback_text.update()
+        
+        # Reseta a avaliação
+        for i in range(5):
+            stars[i].name = ft.icons.STAR_BORDER
+        rating.value = "0/5"
+        for star in stars:
+            star.update()
+        rating.update()
+        
+        # Abre o diálogo de confirmação
+        page.dialog = confirm_dialog
+        confirm_dialog.open = True
+        page.update()
+
+    def close_dialog(e):
+        confirm_dialog.open = False
+        page.update()
 
     # Layout principal
     support_view = ft.Container(
@@ -93,7 +137,7 @@ def view(navigate_to):
                             icon=ft.icons.SEND,
                             color=ft.colors.WHITE,
                             bgcolor=ft.colors.BLUE_600,
-                            on_click=lambda e: print(f"Feedback enviado: {feedback_text.value}"),
+                            on_click=open_dialog,
                             width=200,
                             height=40,
                         ),

@@ -1,7 +1,7 @@
 import flet as ft
 from datetime import datetime
 
-def view(page: ft.Page):  # Recebemos a página como parâmetro
+def view(page: ft.Page):
     # Campo de feedback
     feedback_text = ft.TextField(
         multiline=True,
@@ -16,20 +16,77 @@ def view(page: ft.Page):  # Recebemos a página como parâmetro
         capitalization=ft.TextCapitalization.SENTENCES,
     )
 
+    # Variável para armazenar a avaliação selecionada
+    selected_rating = 0
+    hover_rating = 0
+
     # Componente de avaliação com estrelas interativas
     stars = [ft.Icon(ft.icons.STAR_BORDER, color=ft.colors.AMBER) for _ in range(5)]
     rating = ft.Text("0/5", color=ft.colors.GREY_600)
     
-    def rate_app(e, index):
+    def update_stars():
+        """Atualiza a aparência das estrelas com base no hover ou seleção"""
+        current_rating = hover_rating if hover_rating > 0 and selected_rating == 0 else selected_rating
         for i in range(5):
-            stars[i].name = ft.icons.STAR if i <= index else ft.icons.STAR_BORDER
-        rating.value = f"{index+1}/5"
+            stars[i].name = ft.icons.STAR if i < current_rating else ft.icons.STAR_BORDER
+        rating.value = f"{selected_rating}/5"
         rating.update()
         for star in stars:
             star.update()
+
+    def star_enter(e):
+        """Quando o mouse entra em uma estrela"""
+        nonlocal hover_rating
+        idx = stars.index(e.control)
+        hover_rating = idx + 1
+        update_stars()
     
-    for i, star in enumerate(stars):
-        star.on_click = lambda e, idx=i: rate_app(e, idx)
+    def star_leave(e):
+        """Quando o mouse sai de uma estrela"""
+        nonlocal hover_rating
+        hover_rating = 0
+        update_stars()
+    
+    def star_click(e):
+        """Quando clica em uma estrela"""
+        nonlocal selected_rating
+        idx = stars.index(e.control)
+        selected_rating = idx + 1
+        hover_rating = 0  # Reseta o hover após seleção
+        update_stars()
+    
+    # Configura os eventos para cada estrela
+    for star in stars:
+        star.on_enter = star_enter
+        star.on_exit = star_leave
+        star.on_click = star_click
+
+    
+    def handle_hover(e):
+        """Lida com o evento de hover"""
+        idx = stars.index(e.control)
+        if selected_rating == 0:  # Só mostra hover se nenhuma estrela foi selecionada
+            update_stars(idx)
+    
+    def handle_hover_leave(e):
+        """Lida com o evento de saída do hover"""
+        if selected_rating == 0:  # Volta ao estado inicial se nenhuma estrela foi selecionada
+            update_stars()
+        else:  # Mantém a seleção
+            update_stars()
+    
+    def handle_click(e):
+        """Lida com o clique para selecionar a avaliação"""
+        nonlocal selected_rating
+        idx = stars.index(e.control)
+        selected_rating = idx + 1
+        update_stars()
+    
+    # Configura os eventos para cada estrela
+    for star in stars:
+        star.on_hover = handle_hover
+        star.on_hover_leave = handle_hover_leave
+        star.on_click = handle_click
 
     # Diálogo de confirmação
     confirm_dialog = ft.AlertDialog(
@@ -59,12 +116,9 @@ def view(page: ft.Page):  # Recebemos a página como parâmetro
         feedback_text.update()
         
         # Reseta a avaliação
-        for i in range(5):
-            stars[i].name = ft.icons.STAR_BORDER
-        rating.value = "0/5"
-        for star in stars:
-            star.update()
-        rating.update()
+        nonlocal selected_rating
+        selected_rating = 0
+        update_stars()
         
         # Abre o diálogo de confirmação
         page.dialog = confirm_dialog
@@ -75,7 +129,7 @@ def view(page: ft.Page):  # Recebemos a página como parâmetro
         confirm_dialog.open = False
         page.update()
 
-    # Layout principal
+    # Layout principal (o mesmo que antes)
     support_view = ft.Container(
         width=400,
         height=550,
@@ -155,7 +209,7 @@ def view(page: ft.Page):  # Recebemos a página como parâmetro
                             spacing=5,
                             alignment=ft.MainAxisAlignment.CENTER
                         ),
-                        ft.Text("Toque nas estrelas para avaliar", size=12, color=ft.colors.GREY_600),
+                        ft.Text("Passe o mouse e clique para avaliar", size=12, color=ft.colors.GREY_600),
                     ]
                 ),
                 

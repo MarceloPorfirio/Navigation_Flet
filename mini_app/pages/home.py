@@ -58,7 +58,7 @@ def view(navigate_to):
         controls=[
             ft.Text("Atividades Recentes", size=18, weight=ft.FontWeight.BOLD),
             ft.ListTile(
-                title=ft.Text("Reunião com equipe"),
+                title=ft.Text("Reunião com equipe",color='black'),
                 leading=ft.Icon(ft.icons.CHECK_CIRCLE, color=ft.colors.GREEN),
                 subtitle=ft.Text("Hoje - 10:00 AM"),
             ),
@@ -131,7 +131,7 @@ def view(navigate_to):
                                             datetime.now().strftime("%H:%M"),
                                             size=28,
                                             weight=ft.FontWeight.BOLD,
-                                            color=ft.colors.BLUE_200
+                                            color=ft.colors.BLUE
                                         ),
                                     ],
                                     spacing=5,

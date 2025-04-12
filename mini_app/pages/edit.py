@@ -1,7 +1,29 @@
 import flet as ft
 
 def view(navigate_to):
-    # Componentes do formulário
+    def salvar_dados(e):
+        if not nome_input.value.strip():
+            # Se não houver nome, apenas retorna sem salvar
+            return
+
+        # Criar e abrir o dialog
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Boas-vindas!"),
+            content=ft.Text(f"Bem-vindo, {nome_input.value}!"),
+            actions=[
+                ft.TextButton("OK", on_click=lambda e: (
+                    e.page.close(dialog),
+                    navigate_to("home")
+                ))
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+
+        # Adiciona o dialog na página
+        dialog.open = True
+         # Atualiza a página para garantir que o dialog seja mostrado
+    # Campos do formulário
     nome_input = ft.TextField(
         label="Nome completo",
         hint_text="Digite seu nome",
@@ -34,33 +56,6 @@ def view(navigate_to):
         max_lines=4
     )
 
-    # Componente de feedback
-    status_text = ft.Text("", color=ft.colors.GREEN_600)
-
-    def salvar_dados(e):
-        # Validação básica
-        if not nome_input.value.strip():
-            status_text.value = "Nome é obrigatório!"
-            status_text.color = ft.colors.RED
-            status_text.update()
-            return
-            
-        # Dados coletados (apenas para demonstração)
-        dados = {
-            "nome": nome_input.value,
-            "email": email_input.value,
-            "idade": idade_input.value,
-            "endereco": endereco_input.value
-        }
-        
-        # Feedback visual
-        status_text.value = f"Dados salvos!\nNome: {dados['nome']}"
-        status_text.color = ft.colors.GREEN_600
-        status_text.update()
-
-        # Volta para home
-        navigate_to("home")
-
     return ft.Container(
         width=400,
         height=550,
@@ -71,7 +66,6 @@ def view(navigate_to):
         content=ft.Column(
             scroll=ft.ScrollMode.AUTO,
             controls=[
-                # Cabeçalho
                 ft.Row(
                     controls=[
                         ft.IconButton(
@@ -82,21 +76,12 @@ def view(navigate_to):
                     ],
                     alignment=ft.MainAxisAlignment.START
                 ),
-                
-                ft.Text("Editar Perfil", 
-                       size=24,
-                       weight=ft.FontWeight.BOLD,
-                       color=ft.colors.BLACK),
-                
+                ft.Text("Editar Perfil", size=24, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK),
                 ft.Divider(height=20),
-                
-                # Campos do formulário
                 nome_input,
                 email_input,
                 idade_input,
                 endereco_input,
-                
-                # Botão de salvar
                 ft.ElevatedButton(
                     "Salvar Alterações",
                     icon=ft.icons.SAVE,
@@ -109,8 +94,6 @@ def view(navigate_to):
                     ),
                     width=300
                 ),
-                
-                status_text
             ],
             spacing=15,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER

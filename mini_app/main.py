@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent))
 def main(page: ft.Page):
     # Configurações da página (idênticas ao original)
     page.bgcolor = ft.colors.BLUE_200
-    page.theme_mode = "dark"
+    # page.theme_mode = "dark"
     page.title = "Navegações"
     page.window_width = 450
     page.window_height = 700

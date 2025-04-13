@@ -28,7 +28,8 @@ def view(navigate_to):
         label="Nome completo",
         hint_text="Digite seu nome",
         border_color=ft.colors.GREY_400,
-        capitalization=ft.TextCapitalization.WORDS
+        capitalization=ft.TextCapitalization.WORDS,
+        on_focus=True,
     )
     
     email_input = ft.TextField(

@@ -1,7 +1,7 @@
 import flet as ft
 from datetime import datetime
 
-def view(navigate_to):
+def view(navigate_to,page):
     # Variáveis para armazenar as notas
     notas = []
     nota_input = ft.TextField(

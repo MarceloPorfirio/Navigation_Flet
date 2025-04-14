@@ -1,6 +1,6 @@
 import flet as ft
 
-def view(navigate_to):
+def view(navigate_to,page):
     # Variáveis para armazenar as configurações
     tema_selecionado = "Escuro"
     cor_selecionada = "Azul"

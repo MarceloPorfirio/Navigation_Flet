@@ -1,10 +1,11 @@
 import flet as ft
 from datetime import datetime
 
-def view(navigate_to):
+def view(navigate_to,page):
+    nome = page.client_storage.get("nome_usuario") or "usuário"
     # Componentes da interface
     welcome_text = ft.Text(
-        value=f"Bem-vindo(a)!",
+        value=f"Bem-vindo(a)!, {nome}",
         size=28,
         weight=ft.FontWeight.BOLD,
         color=ft.colors.BLUE_800

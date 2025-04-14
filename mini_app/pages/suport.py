@@ -1,7 +1,7 @@
 import flet as ft
 from datetime import datetime
 
-def view(page: ft.Page):
+def view(navigate_to, page):
     # Campo de feedback
     feedback_text = ft.TextField(
         multiline=True,
@@ -18,75 +18,35 @@ def view(page: ft.Page):
 
     # Variável para armazenar a avaliação selecionada
     selected_rating = 0
-    hover_rating = 0
 
     # Componente de avaliação com estrelas interativas
-    stars = [ft.Icon(ft.icons.STAR_BORDER, color=ft.colors.AMBER) for _ in range(5)]
+    stars = []
     rating = ft.Text("0/5", color=ft.colors.GREY_600)
-    
+
     def update_stars():
-        """Atualiza a aparência das estrelas com base no hover ou seleção"""
-        current_rating = hover_rating if hover_rating > 0 and selected_rating == 0 else selected_rating
-        for i in range(5):
-            stars[i].name = ft.icons.STAR if i < current_rating else ft.icons.STAR_BORDER
+        """Atualiza a aparência das estrelas com base na seleção"""
+        for i, star in enumerate(stars):
+            icon = star.content  # Acessa o Icon dentro do GestureDetector
+            icon.name = ft.icons.STAR_OUTLINED if i < selected_rating else ft.icons.STAR_BORDER
+            icon.update()
         rating.value = f"{selected_rating}/5"
         rating.update()
-        for star in stars:
-            star.update()
 
-    def star_enter(e):
-        """Quando o mouse entra em uma estrela"""
-        nonlocal hover_rating
-        idx = stars.index(e.control)
-        hover_rating = idx + 1
-        update_stars()
-    
-    def star_leave(e):
-        """Quando o mouse sai de uma estrela"""
-        nonlocal hover_rating
-        hover_rating = 0
-        update_stars()
-    
-    def star_click(e):
-        """Quando clica em uma estrela"""
-        nonlocal selected_rating
-        idx = stars.index(e.control)
-        selected_rating = idx + 1
-        hover_rating = 0  # Reseta o hover após seleção
-        update_stars()
-    
-    # Configura os eventos para cada estrela
-    for star in stars:
-        star.on_enter = star_enter
-        star.on_exit = star_leave
-        star.on_click = star_click
-
-    
-    def handle_hover(e):
-        """Lida com o evento de hover"""
-        idx = stars.index(e.control)
-        if selected_rating == 0:  # Só mostra hover se nenhuma estrela foi selecionada
-            update_stars(idx)
-    
-    def handle_hover_leave(e):
-        """Lida com o evento de saída do hover"""
-        if selected_rating == 0:  # Volta ao estado inicial se nenhuma estrela foi selecionada
-            update_stars()
-        else:  # Mantém a seleção
-            update_stars()
-    
-    def handle_click(e):
-        """Lida com o clique para selecionar a avaliação"""
+    def on_star_click(e):
         nonlocal selected_rating
         idx = stars.index(e.control)
         selected_rating = idx + 1
         update_stars()
-    
-    # Configura os eventos para cada estrela
-    for star in stars:
-        star.on_hover = handle_hover
-        star.on_hover_leave = handle_hover_leave
-        star.on_click = handle_click
+
+    # Criar estrelas e associar o evento de clique usando GestureDetector
+    for _ in range(5):
+        icon = ft.Icon(
+            name=ft.icons.STAR_BORDER,
+            color=ft.colors.AMBER,
+            size=32,
+        )
+        star = ft.GestureDetector(on_tap=on_star_click, content=icon)
+        stars.append(star)
 
     # Diálogo de confirmação
     confirm_dialog = ft.AlertDialog(
@@ -100,27 +60,22 @@ def view(page: ft.Page):
     )
 
     def open_dialog(e):
-        # Verifica se há texto no feedback antes de enviar
         if not feedback_text.value:
             feedback_text.error_text = "Por favor, digite seu feedback"
             feedback_text.update()
             return
-        
-        # Aqui você pode adicionar a lógica para enviar o feedback
+
         print(f"Feedback enviado: {feedback_text.value}")
         print(f"Avaliação: {rating.value}")
-        
-        # Limpa os campos após o envio
+
         feedback_text.value = ""
         feedback_text.error_text = None
         feedback_text.update()
-        
-        # Reseta a avaliação
+
         nonlocal selected_rating
         selected_rating = 0
         update_stars()
-        
-        # Abre o diálogo de confirmação
+
         page.dialog = confirm_dialog
         confirm_dialog.open = True
         page.update()
@@ -129,7 +84,7 @@ def view(page: ft.Page):
         confirm_dialog.open = False
         page.update()
 
-    # Layout principal (o mesmo que antes)
+    # Layout principal
     support_view = ft.Container(
         width=400,
         height=550,
@@ -140,7 +95,6 @@ def view(page: ft.Page):
             scroll=ft.ScrollMode.AUTO,
             spacing=20,
             controls=[
-                # Cabeçalho
                 ft.Column(
                     spacing=5,
                     controls=[
@@ -155,8 +109,7 @@ def view(page: ft.Page):
                         ft.Divider(height=10),
                     ]
                 ),
-                
-                # Seção de contato
+
                 ft.Column(
                     spacing=8,
                     controls=[
@@ -178,8 +131,7 @@ def view(page: ft.Page):
                         ft.Divider(height=20),
                     ]
                 ),
-                
-                # Seção de feedback
+
                 ft.Column(
                     spacing=8,
                     controls=[
@@ -198,8 +150,7 @@ def view(page: ft.Page):
                         ft.Divider(height=20),
                     ]
                 ),
-                
-                # Seção de avaliação
+
                 ft.Column(
                     spacing=8,
                     controls=[
@@ -209,11 +160,10 @@ def view(page: ft.Page):
                             spacing=5,
                             alignment=ft.MainAxisAlignment.CENTER
                         ),
-                        ft.Text("Passe o mouse e clique para avaliar", size=12, color=ft.colors.GREY_600),
+                        ft.Text("Clique nas estrelas para avaliar", size=12, color=ft.colors.GREY_600),
                     ]
                 ),
-                
-                # Rodapé
+
                 ft.Column(
                     spacing=5,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,

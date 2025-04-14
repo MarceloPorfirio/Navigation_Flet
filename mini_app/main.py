@@ -2,6 +2,8 @@ import flet as ft
 import sys
 from pathlib import Path
 
+
+
 # Configuração do caminho
 sys.path.append(str(Path(__file__).parent))
 
@@ -37,21 +39,22 @@ def main(page: ft.Page):
     
     def change_view(view_name):
         views = {
-            "home": home_view,
-            "edit": edit_view,
-            "notes": notes_view,
-            "todo": todo_view,
-            "settings": settings_view,
-            "support": support_view
-        }
+                "home": lambda: home_view(change_view, page),
+                "edit": lambda: edit_view(change_view,page),
+                "notes": lambda: notes_view(change_view,page),
+                "todo": lambda: todo_view(change_view,page),
+                "settings": lambda: settings_view(change_view,page),
+                "support": lambda: support_view(change_view,page),
+            }
+
         
         if view_name in views:
-            current_view.current.content = views[view_name](change_view)
+            current_view.current.content = views[view_name]()
             page.update()
 
     # Configuração inicial
     current_view.current = ft.Container(
-        content=home_view(change_view),
+        content=home_view(change_view,page),
         width=400,
         height=550,
         bgcolor="white",

@@ -1,28 +1,33 @@
 import flet as ft
 
-def view(navigate_to):
+def view(navigate_to,page):
     def salvar_dados(e):
         if not nome_input.value.strip():
-            # Se não houver nome, apenas retorna sem salvar
-            return
-
-        # Criar e abrir o dialog
-        dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Boas-vindas!"),
-            content=ft.Text(f"Bem-vindo, {nome_input.value}!"),
-            actions=[
-                ft.TextButton("OK", on_click=lambda e: (
-                    e.page.close(dialog),
-                    navigate_to("home")
-                ))
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
+            return  # Se não houver nome, apenas retorna sem salvar
+        e.page.client_storage.set("nome_usuario", nome_input.value)
+        # Criar o conteúdo da snackbar com os dados preenchidos
+        e.page.snack_bar = ft.SnackBar(
+            content=ft.Text(
+                f"Dados salvos:\n"
+                f"Nome: {nome_input.value}\n"
+                f"Email: {email_input.value}\n"
+                f"Idade: {idade_input.value}\n"
+                f"Endereço: {endereco_input.value}",
+                size=16,
+                weight=ft.FontWeight.BOLD
+                
+            ),
+            bgcolor=ft.colors.BLUE_700,
+            duration=4000,
+            padding=20,
         )
 
-        # Adiciona o dialog na página
-        dialog.open = True
-         # Atualiza a página para garantir que o dialog seja mostrado
+        e.page.snack_bar.open = True
+        e.page.update()
+
+        # Após exibir a snackbar, pode navegar para "home" se quiser
+        navigate_to("home")
+
     # Campos do formulário
     nome_input = ft.TextField(
         label="Nome completo",
@@ -31,14 +36,14 @@ def view(navigate_to):
         capitalization=ft.TextCapitalization.WORDS,
         on_focus=True,
     )
-    
+
     email_input = ft.TextField(
         label="Email",
         hint_text="seu@email.com",
         border_color=ft.colors.GREY_400,
         keyboard_type=ft.KeyboardType.EMAIL
     )
-    
+
     idade_input = ft.TextField(
         label="Idade",
         hint_text="Digite sua idade",
@@ -47,7 +52,7 @@ def view(navigate_to):
         input_filter=ft.NumbersOnlyInputFilter(),
         max_length=3
     )
-    
+
     endereco_input = ft.TextField(
         label="Endereço completo",
         hint_text="Rua, número, complemento",

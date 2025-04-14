@@ -1,7 +1,7 @@
 import flet as ft
 from datetime import datetime
 
-def view(navigate_to):
+def view(navigate_to,page):
     # Variável de tarefas movida para dentro da função view
     tarefas = []
 

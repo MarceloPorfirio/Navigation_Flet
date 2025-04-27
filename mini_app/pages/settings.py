@@ -119,7 +119,24 @@ def view(navigate_to,page):
     def set_notificacoes(ativas):
         nonlocal notificacoes_ativas
         notificacoes_ativas = ativas
-        aplicar_configuracoes()
+       
+
+        # Mostrar snackbar
+        if notificacoes_ativas:
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text("Notificações ativadas"),
+                bgcolor=ft.colors.GREEN,
+                behavior=ft.SnackBarBehavior.FLOATING
+            )
+        else:
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text("Notificações desativadas"),
+                bgcolor=ft.colors.RED,
+                behavior=ft.SnackBarBehavior.FLOATING
+            )
+        page.snack_bar.open = True
+        page.update()
+
 
     # Título da seção "Aparência"
     tema_text = ft.Text("Configurações", size=24, weight=ft.FontWeight.BOLD, color=ft.colors.BLACK)

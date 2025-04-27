@@ -4,7 +4,7 @@ def view(navigate_to,page):
     def salvar_dados(e):
         if not nome_input.value.strip():
             return  # Se não houver nome, apenas retorna sem salvar
-        e.page.client_storage.set("nome_usuario", nome_input.value)
+        e.page.client_storage.set("nome_usuario" ,nome_input.value)
         # Criar o conteúdo da snackbar com os dados preenchidos
         e.page.snack_bar = ft.SnackBar(
             content=ft.Text(
@@ -30,11 +30,11 @@ def view(navigate_to,page):
 
     # Campos do formulário
     nome_input = ft.TextField(
-        label="Nome completo",
+        label="Nome",
         hint_text="Digite seu nome",
         border_color=ft.colors.GREY_400,
         capitalization=ft.TextCapitalization.WORDS,
-        on_focus=True,
+        
     )
 
     email_input = ft.TextField(

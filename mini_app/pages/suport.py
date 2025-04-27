@@ -124,7 +124,7 @@ def view(navigate_to, page):
                         ft.Row(
                             controls=[
                                 ft.Icon(ft.icons.PHONE, size=18, color=ft.colors.BLUE_500),
-                                ft.Text("(11) 98765-4321", color=ft.colors.BLUE_600),
+                                ft.Text("(51) 98765-4321", color=ft.colors.BLUE_600),
                             ],
                             spacing=10
                         ),
@@ -138,15 +138,7 @@ def view(navigate_to, page):
                         ft.Text("Feedback", size=16, weight=ft.FontWeight.BOLD),
                         ft.Text("Sua opinião é importante para melhorarmos!", size=12, color=ft.colors.GREY_600),
                         feedback_text,
-                        ft.ElevatedButton(
-                            "Enviar Feedback",
-                            icon=ft.icons.SEND,
-                            color=ft.colors.WHITE,
-                            bgcolor=ft.colors.BLUE_600,
-                            on_click=open_dialog,
-                            width=200,
-                            height=40,
-                        ),
+                        
                         ft.Divider(height=20),
                     ]
                 ),
@@ -161,6 +153,16 @@ def view(navigate_to, page):
                             alignment=ft.MainAxisAlignment.CENTER
                         ),
                         ft.Text("Clique nas estrelas para avaliar", size=12, color=ft.colors.GREY_600),
+                        ft.Divider(color='transparent'),
+                        ft.ElevatedButton(
+                            "Enviar Feedback",
+                            icon=ft.icons.SEND,
+                            color=ft.colors.WHITE,
+                            bgcolor=ft.colors.BLUE_600,
+                            on_click=open_dialog,
+                            width=200,
+                            height=40,
+                        ),
                     ]
                 ),
 

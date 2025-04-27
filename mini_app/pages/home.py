@@ -1,11 +1,25 @@
 import flet as ft
 from datetime import datetime
 
+import locale
+from datetime import datetime
+
+# Define a localidade para português do Brasil
+locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')  # Use 'pt_BR' no Windows
+
+# Exemplo de uso no seu componente
+date_text = ft.Text(
+    value=datetime.now().strftime("%A, %d de %B de %Y"),  # Segunda-feira, 14 de abril de 2025
+    size=16,
+    color=ft.colors.GREY_600
+)
+
+
 def view(navigate_to,page):
     nome = page.client_storage.get("nome_usuario") or "usuário"
     # Componentes da interface
     welcome_text = ft.Text(
-        value=f"Bem-vindo(a)!, {nome}",
+        value=f"Bem-vindo(a)!  {nome}",
         size=28,
         weight=ft.FontWeight.BOLD,
         color=ft.colors.BLUE_800
